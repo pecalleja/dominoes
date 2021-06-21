@@ -1,39 +1,7 @@
 # Write your code here
-import random
-
-
-class Player:
-    pieces: list
-
-    def __init__(self, name: str):
-        self.name = name
-        self.pieces = []
-
-    def start_piece(self):
-        doubles = [x for x in self.pieces if x[0] == x[1]]
-        doubles.sort()
-        high_double = doubles[-1]
-        self.pieces.remove(high_double)
-        return high_double
-
-
-class Stock:
-    pieces: list
-
-    def __init__(self):
-        self.pieces = []
-        for x in range(0, 7):
-            for y in range(x, 7):
-                self.pieces.append([x, y])
-
-    def randomize(self):
-        random.shuffle(self.pieces)
-
-    def draw_random_piece(self, player: Player, amount=1):
-        for _ in range(amount):
-            piece = random.choice(self.pieces)
-            player.pieces.append(piece)
-            self.pieces.remove(piece)
+from dataclasses import dataclass
+from player import Player
+from stock import Stock
 
 
 class DominoesGame:
@@ -42,6 +10,7 @@ class DominoesGame:
     _max_pieces = 7
     starting: Player = None
     next: Player = None
+    snake: list
 
     def __init__(self, stock: Stock, players: list[Player]):
         self.stock = stock
@@ -69,11 +38,37 @@ class DominoesGame:
                 return player
 
 
+@dataclass()
+class DominoesGUI:
+    game: DominoesGame
+    user: str
+
+    def render(self):
+        print("="*70)
+        print("Stock pieces:", len(self.game.stock.pieces))
+        your_pieces = []
+        for player in self.game.players:
+            if player.name != self.user:
+                print(f"{player.name} pieces:", len(player.pieces))
+            else:
+                your_pieces = player.pieces
+        print()
+        print(self.game.snake)
+        print()
+        print("Your pieces:")
+        for index, piece in enumerate(your_pieces):
+            print(f"{index+1}:{piece}")
+        print()
+        status_msg = "Status: "
+        if self.game.next.name == self.user:
+            status_msg += "It's your turn to make a move. Enter your command."
+        else:
+            status_msg += f"{self.game.next.name} is about to make a move. Press Enter to continue..."
+        print(status_msg)
+
+
 game = DominoesGame(Stock(), [Player("computer"), Player("player")])
+gui = DominoesGUI(game=game, user="player")
 initial_player = game.start()
-snake_piece = [initial_player.start_piece()]
-print("Stock pieces:", game.stock.pieces)
-print("Computer pieces:", game.players[0].pieces)
-print("Player pieces:", game.players[1].pieces)
-print("Domino snake:", snake_piece)
-print("Status:", game.next.name)
+game.snake = initial_player.start_piece()
+gui.render()
