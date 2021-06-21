@@ -15,6 +15,7 @@ class Stock:
         random.shuffle(self.pieces)
 
     def draw_random_piece(self, player: Player, amount=1):
+        # TODO: what if stock is empty ?
         for _ in range(amount):
             piece = random.choice(self.pieces)
             player.pieces.append(piece)
