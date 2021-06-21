@@ -50,14 +50,15 @@ class PlayerBehaviour(AbstractPlayerBehaviour):
                 index = abs(command) - 1
                 if command != 0:
                     player_choice = player_pieces[index]
-                    # found = False
-                    # for tile in player_choice:
-                    #     if command > 0 and tile in snake.elements[-1]:
-                    #         found = True
-                    #     if command < 0 and tile in snake.elements[0]:
-                    #         found = True
-                    # if not found:
-                    #     raise ValueError("Pieces do not match with snake tail")
+                    found = False
+                    for tile in player_choice:
+                        if command > 0 and tile == snake.elements[-1][-1]:
+                            found = True
+                        if command < 0 and tile == snake.elements[0][0]:
+                            found = True
+                    if not found:
+                        print("Illegal move. Please try again.")
+                        continue
                 valid_input = True
             except (ValueError, IndexError):
                 print("Invalid input. Please try again.")
@@ -75,10 +76,21 @@ class PlayerBehaviour(AbstractPlayerBehaviour):
 class ComputerBehaviour(AbstractPlayerBehaviour):
     def make_a_move(self, computer_pieces: list, snake):
         input()
-        choice = random.choice(computer_pieces)
-        side = random.choice(["-", "+"])
-        if side == "+":
-            snake.add_right(choice)
+        valid_input = False
+        for piece in computer_pieces:
+            for tile in piece:
+                if tile == snake.elements[-1][-1]:
+                    choice = piece
+                    valid_input = True
+                    snake.add_right(choice)
+                    break
+                if tile == snake.elements[0][0]:
+                    choice = piece
+                    valid_input = True
+                    snake.add_left(choice)
+            if valid_input:
+                break
+        if valid_input:
+            return choice
         else:
-            snake.add_left(choice)
-        return choice
+            return None

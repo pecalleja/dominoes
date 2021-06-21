@@ -6,10 +6,23 @@ class Snake:
     elements: list = field(default_factory=list)
 
     def add_left(self, piece):
-        self.elements.insert(0, piece)
+        if piece[-1] != self.elements[0][0]:
+            a, b = piece[-1], piece[0]
+            self.elements.insert(0, [a, b])
+        else:
+            a, b = piece[0], piece[-1]
+            self.elements.insert(0, [a, b])
 
     def add_right(self, piece):
-        self.elements.append(piece)
+        if self.elements:
+            if piece[0] != self.elements[-1][-1]:
+                a, b = piece[-1], piece[0]
+                self.elements.append([a, b])
+            else:
+                a, b = piece[0], piece[-1]
+                self.elements.append([a, b])
+        else:
+            self.elements.append(piece)
 
     def endings(self):
         head = self.elements[0]
